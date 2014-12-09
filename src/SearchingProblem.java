@@ -13,7 +13,7 @@ public class SearchingProblem {
 
         int[][] res = new int[10][6];
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 3; i++) {
             n += 4;
             for (int j = 0; j < res[i].length; j++) {
                 if (j == 0 && solver.montiCarlo(n, r)) res[i][j]++;
