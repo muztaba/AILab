@@ -29,7 +29,7 @@ public class ArrayUtils {
         }
     }
 
-    public static void copyArray(int[] array, int[] s) {
-        System.arraycopy(array, 0, s, 0, s.length);
+    public static void copyArray(int[] src, int[] dest) {
+        System.arraycopy(src, 0, dest, 0, src.length);
     }
 }
