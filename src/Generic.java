@@ -4,20 +4,31 @@ import java.io.*;
  * Created by seal on 12/10/14.
  */
 public class Generic {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+        PrintWriter out = new PrintWriter(new FileWriter("GenericTestOut.txt"));
+        GenericAlgorithm solver = new GenericAlgorithm();
+        StopWatch.start();
+        for (int i = 4; i < 20; i++) {
+
+            out.println(i + " " + solver.solve(i, new Random(), out));
+        }
+        out.println(StopWatch.elapsedTime());
+        out.close();
     }
 }
 
 class GenericAlgorithm {
     public static final int P = 10;
-    public static final int N = 1 << 10;
-    PriorityQueue<Node> queue = new PriorityQueue<>();
-    public boolean solve(int n, Random r) {
+    public static final int N = 1 << 20;
+    PriorityQueue<Node> queue;
+
+    public boolean solve(int n, Random r, PrintWriter out) {
+        queue = new PriorityQueue<>();
         Node[] p = new Node[n];
         Node[] c = new Node[n];
+
         for (int i = 0; i < p.length; i++) {
             p[i] = new Node(n);
-            c[i] = new Node();
         }
 
         for (int i = 0; i < p.length; i++) {
@@ -26,41 +37,61 @@ class GenericAlgorithm {
         }
 
         for (int C = 0; C < N; C++) {
-
+            queue.clear();
             /*
             crossover from the parent array p
              */
-            for (int c1Pos = 0, c2Pos = 1; c1Pos < p.length && c2Pos < p.length; c1Pos += 2, c2Pos += 2) {
+            for (int c1Pos = 0, c2Pos = 1; ; c1Pos += 2, c2Pos += 2) {
                 int[] c1 = p[r.nextInt(p.length)].getArray();
                 int[] c2 = p[r.nextInt(p.length)].getArray();
 
-                c[c1Pos].setArray(c1);
-                c[c2Pos].setArray(c2);
+                crossOver(n, c1, c2, r, out);
 
+//                c[c1Pos] = new Node(c1);
+//                c[c2Pos] = new Node(c2);
+                if (c1Pos < p.length) c[c1Pos] = new Node(c1); else break;
+                if (c2Pos < p.length) c[c2Pos] = new Node(c2); else break;
             }
             /*
             make a change to the crossover array c and then added to the Priority Queue array - p, c, and changed[mutant] c.
              */
-            for (int i = 0; i < c.length; i++) {
+//            for (int i = 0; i < p.length; i++) {
+//                out.println(Arrays.toString(p[i].s) + " " + p[i].s);
+//                out.println(Arrays.toString(c[i].s) + " " + c[i].s);
+//                out.println();
+//            }
+            for (int i = 0; i < p.length; i++) {
+                p[i].getQuality();
+                queue.add(p[i]);
+
+                c[i].getQuality();
                 queue.add(c[i]);
+
                 c[i].makeChange(r);
                 queue.add(c[i]);
-                queue.add(p[i]);
             }
+//            out.println();
+//            for (int i = 0; i < c.length; i++) {
+//                out.println(Arrays.toString(c[i].s) + " " + c[i].s);
+//            }
+
+
 
             for (int i = 0; i < p.length; i++) {
                 p[i] = queue.poll();
-                if (p[i].q == 0) return true;
+                if (p[i].getQ() == 0) return true;
             }
 
-            queue.clear();
         }
-
+        out.println(n + "  " + queue.poll().getQ());
         return false;
     }
 
-    public void crossOver(int n, int[] c1, int[] c2, Random r) {
+    public void crossOver(int n, int[] c1, int[] c2, Random r, PrintWriter out) {
         int t = r.nextInt(n) + 1;
+        if (t == 1) t += 1;
+        else if (t == n) t -= 1;
+
         int[] p = new int[c1.length], q = new int[c2.length];
 
         ArrayUtils.copyArray(c1, p, 1, 1, t + 1);
@@ -72,11 +103,13 @@ class GenericAlgorithm {
         ArrayUtils.copyArray(p, c1);
         ArrayUtils.copyArray(q, c2);
     }
+
+
 }
 
 class Node implements Comparable<Node>{
     int[] s = null;
-    public int q = 0;
+    private int q = 0;
 
     public Node() {}
     public Node(int n) {
@@ -97,25 +130,29 @@ class Node implements Comparable<Node>{
         return this.q;
     }
 
+    public int getQ() { return this.q; }
+
     public void setArray(int[] s) {
         this.s = s;
     }
 
     public int[] getArray() {
-        return s;
+        int[] t = new int[s.length];
+        ArrayUtils.copyArray(this.s, t);
+        return t;
     }
 
     public void makeChange(Random r) {
         int index = r.nextInt(s.length -1) + 1;
         int val = r.nextInt(s.length -1) + 1;
+
         s[index] = val;
         getQuality();
     }
 
     @Override
     public int compareTo(Node o) {
-        return Integer.compare(this.q, o.q);
+        return Integer.compare(this.q, o.getQ());
     }
 
 }
-
