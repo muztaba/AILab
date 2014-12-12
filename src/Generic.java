@@ -6,12 +6,14 @@ import java.io.*;
 public class Generic {
     public static void main(String[] args) throws IOException {
         PrintWriter out = new PrintWriter(new FileWriter("GenericTestOut.txt"));
+        Random r = new Random();
         GenericAlgorithm solver = new GenericAlgorithm();
         StopWatch.start();
-        for (int i = 4; i < 20; i++) {
 
-            out.println(i + " " + solver.solve(i, new Random(), out));
-        }
+            for (int i = 4; i < 40; i += 4) {
+               out.println( solver.solve(i, new Random(), out));
+            }
+
         out.println(StopWatch.elapsedTime());
         out.close();
     }
@@ -26,6 +28,7 @@ class GenericAlgorithm {
         queue = new PriorityQueue<>();
         Node[] p = new Node[n];
         Node[] c = new Node[n];
+
 
         for (int i = 0; i < p.length; i++) {
             p[i] = new Node(n);
@@ -44,46 +47,51 @@ class GenericAlgorithm {
             for (int c1Pos = 0, c2Pos = 1; ; c1Pos += 2, c2Pos += 2) {
                 int[] c1 = p[r.nextInt(p.length)].getArray();
                 int[] c2 = p[r.nextInt(p.length)].getArray();
+//                out.println(Arrays.toString(c1));
+//                out.println(Arrays.toString(c2));
 
                 crossOver(n, c1, c2, r, out);
 
-//                c[c1Pos] = new Node(c1);
-//                c[c2Pos] = new Node(c2);
-                if (c1Pos < p.length) c[c1Pos] = new Node(c1); else break;
-                if (c2Pos < p.length) c[c2Pos] = new Node(c2); else break;
+                if (c1Pos < p.length) c[c1Pos] = new Node(c1);
+                else break;
+                if (c2Pos < p.length) c[c2Pos] = new Node(c2);
+                else break;
+
+//                out.println(Arrays.toString(c[c1Pos].s));
+//                out.println(Arrays.toString(c[c2Pos].s));
+//                out.println(Arrays.toString(p[index1].getArray()));
+//                out.println(Arrays.toString(p[index2].getArray()));
+
+
             }
+
             /*
             make a change to the crossover array c and then added to the Priority Queue array - p, c, and changed[mutant] c.
              */
-//            for (int i = 0; i < p.length; i++) {
-//                out.println(Arrays.toString(p[i].s) + " " + p[i].s);
-//                out.println(Arrays.toString(c[i].s) + " " + c[i].s);
-//                out.println();
-//            }
             for (int i = 0; i < p.length; i++) {
                 p[i].getQuality();
                 queue.add(p[i]);
+//                out.println(Arrays.toString(p[i].getArray()));
 
                 c[i].getQuality();
                 queue.add(c[i]);
 
-                c[i].makeChange(r);
-                queue.add(c[i]);
+//                out.println(Arrays.toString(c[i].getArray()));
+
+                Node mutant = new Node (c[i].getArray());
+                mutant.makeChange(r);
+//                out.println(Arrays.toString(mutant.getArray()));
+//                out.println('\n');
+                queue.add(mutant);
             }
-//            out.println();
-//            for (int i = 0; i < c.length; i++) {
-//                out.println(Arrays.toString(c[i].s) + " " + c[i].s);
-//            }
-
-
-
             for (int i = 0; i < p.length; i++) {
                 p[i] = queue.poll();
                 if (p[i].getQ() == 0) return true;
             }
 
         }
-        out.println(n + "  " + queue.poll().getQ());
+
+        out.print(" "+queue.poll().getQ());
         return false;
     }
 
@@ -91,7 +99,6 @@ class GenericAlgorithm {
         int t = r.nextInt(n) + 1;
         if (t == 1) t += 1;
         else if (t == n) t -= 1;
-
         int[] p = new int[c1.length], q = new int[c2.length];
 
         ArrayUtils.copyArray(c1, p, 1, 1, t + 1);
