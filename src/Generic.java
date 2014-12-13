@@ -8,13 +8,12 @@ public class Generic {
         PrintWriter out = new PrintWriter(new FileWriter("GenericTestOut.txt"));
         Random r = new Random();
         GenericAlgorithm solver = new GenericAlgorithm();
-        StopWatch.start();
 
-            for (int i = 4; i < 40; i += 4) {
+            for (int i = 4; i <= 40; i += 4) {
+                System.out.println(i);
                out.println( solver.solve(i, new Random(), out));
             }
 
-        out.println(StopWatch.elapsedTime());
         out.close();
     }
 }
@@ -31,11 +30,11 @@ class GenericAlgorithm {
 
 
         for (int i = 0; i < p.length; i++) {
-            p[i] = new Node(n);
+            p[i] = new Node();
         }
 
         for (int i = 0; i < p.length; i++) {
-            ArrayUtils.init(n, p[i].s, r);
+            p[i].setArray(ArrayUtils.init(n + 1, r));
             if (p[i].getQuality() == 0) return true;
         }
 
@@ -91,7 +90,7 @@ class GenericAlgorithm {
 
         }
 
-        out.print(" "+queue.poll().getQ());
+        out.print(" "+queue.poll().getQ() + " ");
         return false;
     }
 
@@ -115,7 +114,7 @@ class GenericAlgorithm {
 }
 
 class Node implements Comparable<Node>{
-    int[] s = null;
+    private int[] s = null;
     private int q = 0;
 
     public Node() {}
