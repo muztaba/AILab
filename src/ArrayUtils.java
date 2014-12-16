@@ -13,8 +13,8 @@ public class ArrayUtils {
         return s;
     }
 
-    public static void copyArray(int[] src, int[] dest, int from, int to, int length) {
-        System.arraycopy(src, from, dest, to, length);
+    public static void copyArray(int[] src, int[] dest, int fromSrc, int fromDest, int length) {
+        System.arraycopy(src, fromSrc, dest, fromDest, length);
     }
 
     public static void fillArray(int n, int[] array, Random r) {

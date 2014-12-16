@@ -8,10 +8,11 @@ public class SearchingProblem {
         Random r = new Random();
         PrintWriter out = new PrintWriter(new FileWriter("out.txt"));
         Task solver = new Task();
+        GenericAlgorithm generic = new GenericAlgorithm();
         int n = 0;
 
 
-        int[][] res = new int[10][6];
+        int[][] res = new int[10][7];
 
         for (int i = 0; i < 10; i++) {
             n += 4;
@@ -22,8 +23,9 @@ public class SearchingProblem {
                 else if (j == 3 && solver.hillClimbingRestart(n, r)) res[i][j]++;
                 else if (j == 4 && solver.hillClimbingBS(n, .7, r)) res[i][j]++;
                 else if (j == 5 && solver.simulated(n, r)) res[i][j]++;
-
+                else if (j == 6 && generic.solve(n, r, out)) res[i][j]++;
             }
+            System.out.println(n);
         }
 
         ArrayUtils.printArray(res, out);

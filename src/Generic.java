@@ -9,10 +9,8 @@ public class Generic {
         Random r = new Random();
         GenericAlgorithm solver = new GenericAlgorithm();
 
-            for (int i = 4; i <= 40; i += 4) {
-                System.out.println(i);
-               out.println( solver.solve(i, new Random(), out));
-            }
+            solver.solve(40, r, out);
+
 
         out.close();
     }
@@ -26,7 +24,6 @@ class GenericAlgorithm {
     public boolean solve(int n, Random r, PrintWriter out) {
         queue = new PriorityQueue<>();
         Node[] p = new Node[n];
-        Node[] c = new Node[n];
 
 
         for (int i = 0; i < p.length; i++) {
@@ -35,54 +32,47 @@ class GenericAlgorithm {
 
         for (int i = 0; i < p.length; i++) {
             p[i].setArray(ArrayUtils.init(n + 1, r));
-            if (p[i].getQuality() == 0) return true;
         }
 
         for (int C = 0; C < N; C++) {
+            Node[] c = new Node[n];
             queue.clear();
             /*
             crossover from the parent array p
              */
             for (int c1Pos = 0, c2Pos = 1; ; c1Pos += 2, c2Pos += 2) {
-                int[] c1 = p[r.nextInt(p.length)].getArray();
-                int[] c2 = p[r.nextInt(p.length)].getArray();
-//                out.println(Arrays.toString(c1));
-//                out.println(Arrays.toString(c2));
+                int index = r.nextInt(p.length);
+                int index1 = r.nextInt(p.length);
+                int[] c1 = p[index].getArray();
+                int[] c2 = p[index1].getArray();
 
-                crossOver(n, c1, c2, r, out);
+                crossOver(n, c1, c2, r);
 
-                if (c1Pos < p.length) c[c1Pos] = new Node(c1);
-                else break;
-                if (c2Pos < p.length) c[c2Pos] = new Node(c2);
-                else break;
-
-//                out.println(Arrays.toString(c[c1Pos].s));
-//                out.println(Arrays.toString(c[c2Pos].s));
-//                out.println(Arrays.toString(p[index1].getArray()));
-//                out.println(Arrays.toString(p[index2].getArray()));
-
+                if (c1Pos < p.length) c[c1Pos] = new Node(c1); else break;
+                if (c2Pos < p.length) c[c2Pos] = new Node(c2); else break;
 
             }
 
             /*
-            make a change to the crossover array c and then added to the Priority Queue array - p, c, and changed[mutant] c.
+            Make change to the crossover array / or make all the crossover array as mutant. And add p, c, and mutant to
+            the Priority Queue for.
              */
             for (int i = 0; i < p.length; i++) {
                 p[i].getQuality();
                 queue.add(p[i]);
-//                out.println(Arrays.toString(p[i].getArray()));
 
                 c[i].getQuality();
                 queue.add(c[i]);
 
-//                out.println(Arrays.toString(c[i].getArray()));
-
                 Node mutant = new Node (c[i].getArray());
                 mutant.makeChange(r);
-//                out.println(Arrays.toString(mutant.getArray()));
-//                out.println('\n');
                 queue.add(mutant);
             }
+
+            /*
+            Get the first 10 elements that has quality minimum as parent for the next iteration. If one of these element
+             quality '0' then it return true otherwise go for the next iteration if the 'C' is not out of its limit.
+             */
             for (int i = 0; i < p.length; i++) {
                 p[i] = queue.poll();
                 if (p[i].getQ() == 0) return true;
@@ -94,10 +84,11 @@ class GenericAlgorithm {
         return false;
     }
 
-    public void crossOver(int n, int[] c1, int[] c2, Random r, PrintWriter out) {
+    public void crossOver(int n, int[] c1, int[] c2, Random r) {
         int t = r.nextInt(n) + 1;
-        if (t == 1) t += 1;
-        else if (t == n) t -= 1;
+
+        if (t == 1) t += 2; else if (t == n) t -= 2;
+
         int[] p = new int[c1.length], q = new int[c2.length];
 
         ArrayUtils.copyArray(c1, p, 1, 1, t + 1);
@@ -109,8 +100,6 @@ class GenericAlgorithm {
         ArrayUtils.copyArray(p, c1);
         ArrayUtils.copyArray(q, c2);
     }
-
-
 }
 
 class Node implements Comparable<Node>{
@@ -144,7 +133,7 @@ class Node implements Comparable<Node>{
 
     public int[] getArray() {
         int[] t = new int[s.length];
-        ArrayUtils.copyArray(this.s, t);
+        ArrayUtils.copyArray(s, t);
         return t;
     }
 
@@ -160,5 +149,4 @@ class Node implements Comparable<Node>{
     public int compareTo(Node o) {
         return Integer.compare(this.q, o.getQ());
     }
-
 }
