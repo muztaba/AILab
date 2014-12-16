@@ -41,10 +41,8 @@ class GenericAlgorithm {
             crossover from the parent array p
              */
             for (int c1Pos = 0, c2Pos = 1; ; c1Pos += 2, c2Pos += 2) {
-                int index = r.nextInt(p.length);
-                int index1 = r.nextInt(p.length);
-                int[] c1 = p[index].getArray();
-                int[] c2 = p[index1].getArray();
+                int[] c1 = p[r.nextInt(p.length)].getArray();
+                int[] c2 = p[r.nextInt(p.length)].getArray();
 
                 crossOver(n, c1, c2, r);
 
